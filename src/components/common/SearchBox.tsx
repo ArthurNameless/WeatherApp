@@ -10,6 +10,8 @@ import {
 } from '@mui/material';
 import { Search as SearchIcon, MyLocation as LocationIcon } from '@mui/icons-material';
 
+import { searchBoxStyles } from './SearchBox.styles';
+
 interface SearchBoxProps {
   onSearch: (cityName: string) => void;
   onLocationSearch?: () => void;
@@ -84,15 +86,8 @@ export function SearchBox({
   const displayError = error || localError;
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ width: '100%' }}>
-      <Box
-        sx={{
-          display: 'flex',
-          gap: 1,
-          alignItems: 'flex-start',
-          flexDirection: { xs: 'column', sm: 'row' }
-        }}
-      >
+    <Box component="form" onSubmit={handleSubmit} sx={searchBoxStyles.formContainer}>
+      <Box sx={searchBoxStyles.mainContainer}>
         <TextField
           fullWidth
           variant="outlined"
@@ -114,35 +109,15 @@ export function SearchBox({
               </InputAdornment>
             ) : null
           }}
-          sx={{
-            '& .MuiOutlinedInput-root': {
-              borderRadius: 2,
-              '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'primary.main'
-              }
-            }
-          }}
+          sx={searchBoxStyles.textField}
         />
         
-        <Box
-          sx={{
-            display: 'flex',
-            gap: 1,
-            flexDirection: { xs: 'row', sm: 'column' },
-            minWidth: { sm: 'auto' }
-          }}
-        >
+        <Box sx={searchBoxStyles.buttonContainer}>
           <Button
             type="submit"
             variant="contained"
             disabled={disabled || loading || !!localError || !searchValue.trim()}
-            sx={{
-              minWidth: { xs: '120px', sm: '100px' },
-              height: '56px',
-              borderRadius: 2,
-              textTransform: 'none',
-              fontWeight: 600
-            }}
+            sx={searchBoxStyles.searchButton}
           >
             {loading ? <CircularProgress size={20} color="inherit" /> : t('search.button')}
           </Button>
@@ -153,13 +128,7 @@ export function SearchBox({
               onClick={handleLocationSearch}
               disabled={disabled || loading}
               startIcon={<LocationIcon />}
-              sx={{
-                minWidth: { xs: '120px', sm: '100px' },
-                height: '56px',
-                borderRadius: 2,
-                textTransform: 'none',
-                fontWeight: 600
-              }}
+              sx={searchBoxStyles.locationButton}
             >
               {t('search.myLocation')}
             </Button>
@@ -171,10 +140,7 @@ export function SearchBox({
       {error && !localError && (
         <Alert 
           severity="error" 
-          sx={{ 
-            mt: 2,
-            borderRadius: 2
-          }}
+          sx={searchBoxStyles.errorAlert}
         >
           {error}
         </Alert>

@@ -12,25 +12,22 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { Brightness4, Brightness7 } from "@mui/icons-material";
+
 import { SearchBox } from "@Components/common/SearchBox";
 import { WeatherCard } from "@Components/weather/WeatherCard";
 import { SearchHistory } from "@Components/common/SearchHistory";
-import { useWeather } from "@Hooks/useWeather";
+import { useSearch } from "@Hooks/useSearch";
 import { useSearchHistory } from "@Hooks/useSearchHistory";
-import { weatherApiService } from "@Services/weatherApi";
 import { createAppTheme } from "@Theme/theme";
 import { getAppStyles } from "@Theme/appStyles";
 import { syncCSSColors } from "@Theme/colorSync";
 import type {
   SearchHistoryItem,
-  WeatherResponse,
-  ApiError,
 } from "@Types/weather";
 
 function App() {
   const { t } = useTranslation();
   const [darkMode, setDarkMode] = useState(false);
-  const [locationError, setLocationError] = useState<string | null>(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
@@ -40,19 +37,10 @@ function App() {
     data: weatherData,
     loading,
     error: weatherError,
-    clearError,
-  } = useWeather();
-
-  // Local state setter for direct forecast API calls
-  const [localWeatherData, setLocalWeatherData] =
-    useState<WeatherResponse | null>(null);
-  const [localLoading, setLocalLoading] = useState(false);
-  const [localError, setLocalError] = useState<ApiError | null>(null);
-
-  // Use local state if available, otherwise use hook state
-  const currentWeatherData = localWeatherData || weatherData;
-  const currentLoading = localLoading || loading;
-  const currentError = localError || weatherError;
+    locationError,
+    handleSearch,
+    handleLocationSearch,
+  } = useSearch();
 
   const {
     searchHistory,
@@ -76,79 +64,6 @@ function App() {
   const theme = createAppTheme(darkMode);
   const styles = getAppStyles(darkMode);
 
-  const handleSearch = useCallback(
-    async (cityName: string) => {
-      clearError();
-      setLocationError(null);
-      setLocalError(null);
-      setLocalLoading(true);
-
-      try {
-        // Get forecast data to include sunrise/sunset and min/max temps
-        const forecastData = await weatherApiService.getForecast(cityName, 1);
-
-        // Update the local weather state with forecast data
-        setLocalWeatherData(forecastData);
-        setLocalLoading(false);
-      } catch (error) {
-        console.error("Search failed:", error);
-        setLocalWeatherData(null);
-        setLocalLoading(false);
-        setLocalError(error as ApiError);
-      }
-    },
-    [clearError]
-  );
-
-  const handleLocationSearch = useCallback(() => {
-    setLocationError(null);
-
-    if (!navigator.geolocation) {
-      setLocationError(t('search.errors.geolocationNotSupported'));
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        try {
-          setLocalLoading(true);
-          setLocalError(null);
-          const forecastData = await weatherApiService.getForecast(
-            `${position.coords.latitude},${position.coords.longitude}`,
-            1
-          );
-          setLocalWeatherData(forecastData);
-          setLocalLoading(false);
-        } catch (error) {
-          setLocalLoading(false);
-          setLocalError(error as ApiError);
-          setLocationError(t('search.errors.locationFailed'));
-        }
-      },
-      (error) => {
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            setLocationError(t('search.errors.permissionDenied'));
-            break;
-          case error.POSITION_UNAVAILABLE:
-            setLocationError(t('search.errors.positionUnavailable'));
-            break;
-          case error.TIMEOUT:
-            setLocationError(t('search.errors.timeout'));
-            break;
-          default:
-            setLocationError(t('search.errors.unknownLocationError'));
-            break;
-        }
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 300000, // 5 minutes
-      }
-    );
-  }, []);
-
   const handleHistoryItemClick = useCallback(
     (item: SearchHistoryItem) => {
       handleSearch(item.cityName);
@@ -162,7 +77,7 @@ function App() {
       setSnackbarMessage(t('notifications.itemRemoved'));
       setSnackbarOpen(true);
     },
-    [removeFromHistory]
+    [removeFromHistory, t]
   );
 
   const handleHistoryItemRestore = useCallback(
@@ -171,26 +86,26 @@ function App() {
       setSnackbarMessage(t('notifications.itemRestored'));
       setSnackbarOpen(true);
     },
-    [restoreItem]
+    [restoreItem, t]
   );
 
   const handleClearHistory = useCallback(() => {
     clearHistory();
     setSnackbarMessage(t('notifications.historyCleared'));
     setSnackbarOpen(true);
-  }, [clearHistory]);
+  }, [clearHistory, t]);
 
   // Add successful search to history
   useEffect(() => {
-    if (currentWeatherData) {
+    if (weatherData) {
       addToHistory(
-        currentWeatherData.location.name,
-        currentWeatherData.location.country,
-        currentWeatherData.location.region,
-        currentWeatherData
+        weatherData.location.name,
+        weatherData.location.country,
+        weatherData.location.region,
+        weatherData
       );
     }
-  }, [currentWeatherData, addToHistory]);
+  }, [weatherData, addToHistory]);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -224,14 +139,14 @@ function App() {
             <SearchBox
               onSearch={handleSearch}
               onLocationSearch={handleLocationSearch}
-              loading={currentLoading}
-              error={currentError?.message || locationError}
+              loading={loading}
+              error={weatherError?.message || locationError}
               placeholder={t('search.placeholder')}
             />
 
             {/* Weather Display */}
-            {currentWeatherData && (
-              <WeatherCard weatherData={currentWeatherData} />
+            {weatherData && (
+              <WeatherCard weatherData={weatherData} />
             )}
 
             {/* Search History */}

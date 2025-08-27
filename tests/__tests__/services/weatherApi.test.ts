@@ -1,6 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import axios from 'axios';
-import { weatherApiService } from '@Services/weatherApi';
+import {
+  getCurrentWeather,
+  getCurrentWeatherByCoords,
+  getForecast,
+  formatTemperature,
+  formatWindSpeed,
+  formatPressure,
+  formatVisibility,
+  getWeatherIconUrl,
+  formatTime,
+  getCurrentTemp,
+  getFeelsLikeTemp,
+  getMinMaxTemp,
+  getSunTimes
+} from '@Services/weatherApi';
 
 // Mock axios
 vi.mock('axios');
@@ -71,7 +85,7 @@ describe('WeatherApiService', () => {
       const mockAxiosInstance = mockedAxios.create();
       mockAxiosInstance.get = vi.fn().mockResolvedValue({ data: mockWeatherData });
 
-      const result = await weatherApiService.getCurrentWeather('London');
+      const result = await getCurrentWeather('London');
       
       expect(result).toEqual(mockWeatherData);
     });
@@ -90,7 +104,7 @@ describe('WeatherApiService', () => {
       };
       mockAxiosInstance.get = vi.fn().mockRejectedValue(mockError);
 
-      await expect(weatherApiService.getCurrentWeather('InvalidCity')).rejects.toMatchObject({
+      await expect(getCurrentWeather('InvalidCity')).rejects.toMatchObject({
         message: 'Parameter q is missing.',
         code: 'BAD_REQUEST',
         status: 400
@@ -98,7 +112,7 @@ describe('WeatherApiService', () => {
     });
 
     it('should throw error for empty city name', async () => {
-      await expect(weatherApiService.getCurrentWeather('')).rejects.toThrow('City name is required');
+      await expect(getCurrentWeather('')).rejects.toThrow('City name is required');
     });
 
     it('should sanitize city name input', async () => {
@@ -109,7 +123,7 @@ describe('WeatherApiService', () => {
       const mockAxiosInstance = mockedAxios.create();
       mockAxiosInstance.get = vi.fn().mockResolvedValue({ data: mockWeatherData });
 
-      await expect(weatherApiService.getCurrentWeather('London123!@#')).rejects.toThrow('Invalid city name format');
+      await expect(getCurrentWeather('London123!@#')).rejects.toThrow('Invalid city name format');
     });
   });
 
@@ -130,14 +144,14 @@ describe('WeatherApiService', () => {
       const mockAxiosInstance = mockedAxios.create();
       mockAxiosInstance.get = vi.fn().mockResolvedValue({ data: mockWeatherData });
 
-      const result = await weatherApiService.getCurrentWeatherByCoords(51.52, -0.11);
+      const result = await getCurrentWeatherByCoords(51.52, -0.11);
       
       expect(result).toEqual(mockWeatherData);
     });
 
     it('should throw error for invalid coordinates', async () => {
-      await expect(weatherApiService.getCurrentWeatherByCoords(91, 0)).rejects.toThrow('Invalid coordinates provided');
-      await expect(weatherApiService.getCurrentWeatherByCoords(0, 181)).rejects.toThrow('Invalid coordinates provided');
+      await expect(getCurrentWeatherByCoords(91, 0)).rejects.toThrow('Invalid coordinates provided');
+      await expect(getCurrentWeatherByCoords(0, 181)).rejects.toThrow('Invalid coordinates provided');
     });
   });
 
@@ -171,7 +185,7 @@ describe('WeatherApiService', () => {
       const mockAxiosInstance = mockedAxios.create();
       mockAxiosInstance.get = vi.fn().mockResolvedValue({ data: mockForecastData });
 
-      const result = await weatherApiService.getForecast('London', 1);
+      const result = await getForecast('London', 1);
       
       expect(result).toEqual(mockForecastData);
     });
@@ -180,7 +194,7 @@ describe('WeatherApiService', () => {
       const mockAxiosInstance = mockedAxios.create();
       mockAxiosInstance.get = vi.fn().mockResolvedValue({ data: {} });
 
-      await weatherApiService.getForecast('London', 15); // Should be limited to 10
+      await getForecast('London', 15); // Should be limited to 10
       
       expect(mockAxiosInstance.get).toHaveBeenCalledWith('/forecast.json', {
         params: {
@@ -195,37 +209,37 @@ describe('WeatherApiService', () => {
 
   describe('utility methods', () => {
     it('should format temperature correctly', () => {
-      expect(weatherApiService.formatTemperature(20.7)).toBe('21°C');
-      expect(weatherApiService.formatTemperature(-5.3)).toBe('-5°C');
+      expect(formatTemperature(20.7)).toBe('21°C');
+      expect(formatTemperature(-5.3)).toBe('-5°C');
     });
 
     it('should format wind speed correctly', () => {
-      expect(weatherApiService.formatWindSpeed(11.5)).toBe('12 km/h');
-      expect(weatherApiService.formatWindSpeed(0)).toBe('0 km/h');
+      expect(formatWindSpeed(11.5)).toBe('12 km/h');
+      expect(formatWindSpeed(0)).toBe('0 km/h');
     });
 
     it('should format pressure correctly', () => {
-      expect(weatherApiService.formatPressure(1013.25)).toBe('1013 mb');
+      expect(formatPressure(1013.25)).toBe('1013 mb');
     });
 
     it('should format visibility correctly', () => {
-      expect(weatherApiService.formatVisibility(10.5)).toBe('11 km');
+      expect(formatVisibility(10.5)).toBe('11 km');
     });
 
     it('should generate correct weather icon URL', () => {
-      const iconUrl = weatherApiService.getWeatherIconUrl('//cdn.weatherapi.com/weather/64x64/day/113.png');
+      const iconUrl = getWeatherIconUrl('//cdn.weatherapi.com/weather/64x64/day/113.png');
       expect(iconUrl).toBe('https://cdn.weatherapi.com/weather/64x64/day/113.png');
     });
 
     it('should handle full icon URLs', () => {
       const fullUrl = 'https://cdn.weatherapi.com/weather/64x64/day/113.png';
-      const iconUrl = weatherApiService.getWeatherIconUrl(fullUrl);
+      const iconUrl = getWeatherIconUrl(fullUrl);
       expect(iconUrl).toBe(fullUrl);
     });
 
     it('should format time correctly', () => {
       const timeString = '2021-01-01 15:30';
-      const formattedTime = weatherApiService.formatTime(timeString);
+      const formattedTime = formatTime(timeString);
       expect(formattedTime).toMatch(/\d{1,2}:\d{2}/); // Should match time format
     });
   });
@@ -256,21 +270,21 @@ describe('WeatherApiService', () => {
     };
 
     it('should get current temperature', () => {
-      expect(weatherApiService.getCurrentTemp(mockWeatherData as any)).toBe(20.0);
+      expect(getCurrentTemp(mockWeatherData as any)).toBe(20.0);
     });
 
     it('should get feels like temperature', () => {
-      expect(weatherApiService.getFeelsLikeTemp(mockWeatherData as any)).toBe(18.0);
+      expect(getFeelsLikeTemp(mockWeatherData as any)).toBe(18.0);
     });
 
     it('should get min/max temperatures from forecast', () => {
-      const { min, max } = weatherApiService.getMinMaxTemp(mockWeatherData as any);
+      const { min, max } = getMinMaxTemp(mockWeatherData as any);
       expect(min).toBe(15.0);
       expect(max).toBe(25.0);
     });
 
     it('should get sunrise/sunset times', () => {
-      const { sunrise, sunset } = weatherApiService.getSunTimes(mockWeatherData as any);
+      const { sunrise, sunset } = getSunTimes(mockWeatherData as any);
       expect(sunrise).toBe('07:48 AM');
       expect(sunset).toBe('04:08 PM');
     });
@@ -280,11 +294,11 @@ describe('WeatherApiService', () => {
         current: { temp_c: 20.0, temp_f: 68.0 }
       };
       
-      const { min, max } = weatherApiService.getMinMaxTemp(dataWithoutForecast as any);
+      const { min, max } = getMinMaxTemp(dataWithoutForecast as any);
       expect(min).toBe(20.0);
       expect(max).toBe(20.0);
 
-      const { sunrise, sunset } = weatherApiService.getSunTimes(dataWithoutForecast as any);
+      const { sunrise, sunset } = getSunTimes(dataWithoutForecast as any);
       expect(sunrise).toBe('--:--');
       expect(sunset).toBe('--:--');
     });
