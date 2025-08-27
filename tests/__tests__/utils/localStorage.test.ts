@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { LocalStorageService } from '../../../src/utils/localStorage';
-import type { SearchHistoryItem } from '../../../src/types/weather';
+import { LocalStorageService } from '@Utils/localStorage';
+import type { SearchHistoryItem } from '@Types/weather';
 
 // Mock localStorage
 const localStorageMock = {

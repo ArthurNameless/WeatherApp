@@ -7,6 +7,8 @@ import {
   Divider,
   Avatar
 } from '@mui/material';
+import { useTranslation } from 'react-i18next';
+import { colorHelpers, colors } from '@Theme/colors';
 import {
   Thermostat,
   Air,
@@ -17,8 +19,8 @@ import {
   NightsStay,
   Cloud
 } from '@mui/icons-material';
-import type { WeatherResponse } from '../../types/weather';
-import { weatherApiService } from '../../services/weatherApi';
+import type { WeatherResponse } from '@Types/weather';
+import { weatherApiService } from '@Services/weatherApi';
 
 interface WeatherCardProps {
   weatherData: WeatherResponse;
@@ -26,6 +28,7 @@ interface WeatherCardProps {
 }
 
 export function WeatherCard({ weatherData, showDetails = true }: WeatherCardProps) {
+  const { t } = useTranslation();
   const {
     location,
     current
@@ -55,10 +58,8 @@ export function WeatherCard({ weatherData, showDetails = true }: WeatherCardProp
       elevation={3}
       sx={{
         borderRadius: 3,
-        background: isDay
-          ? 'linear-gradient(135deg, #74b9ff 0%, #0984e3 100%)'
-          : 'linear-gradient(135deg, #2d3436 0%, #636e72 100%)',
-        color: 'white',
+        background: colorHelpers.weatherCardGradient(isDay),
+        color: colors.ui.white,
         overflow: 'visible',
         position: 'relative'
       }}
@@ -70,15 +71,15 @@ export function WeatherCard({ weatherData, showDetails = true }: WeatherCardProp
             <Typography variant="h4" component="h1" sx={{ fontWeight: 700, color: 'white' }}>
               {location.name}
             </Typography>
-            <Typography variant="subtitle1" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+            <Typography variant="subtitle1" sx={{ color: colors.weather.overlay.text.secondary }}>
               {location.region && location.region !== location.name ? `${location.region}, ` : ''}{location.country} • {formatDate(location.localtime)}
             </Typography>
           </Box>
           <Chip
             label={current.condition.text}
             sx={{
-              backgroundColor: 'rgba(255,255,255,0.2)',
-              color: 'white',
+              backgroundColor: colors.weather.overlay.primary,
+              color: colors.ui.white,
               fontWeight: 600,
               backdropFilter: 'blur(10px)'
             }}
@@ -94,7 +95,7 @@ export function WeatherCard({ weatherData, showDetails = true }: WeatherCardProp
               width: 80,
               height: 80,
               mr: 3,
-              backgroundColor: 'rgba(255,255,255,0.1)',
+              backgroundColor: colors.weather.overlay.secondary,
               backdropFilter: 'blur(10px)'
             }}
           />
@@ -102,7 +103,7 @@ export function WeatherCard({ weatherData, showDetails = true }: WeatherCardProp
             <Typography variant="h2" component="div" sx={{ fontWeight: 300, lineHeight: 1 }}>
               {weatherApiService.formatTemperature(weatherApiService.getCurrentTemp(weatherData))}
             </Typography>
-            <Typography variant="h6" sx={{ textTransform: 'capitalize', color: 'rgba(255,255,255,0.9)' }}>
+            <Typography variant="h6" sx={{ textTransform: 'capitalize', color: colors.weather.overlay.text.primary }}>
               {current.condition.text}
             </Typography>
           </Box>
@@ -111,20 +112,20 @@ export function WeatherCard({ weatherData, showDetails = true }: WeatherCardProp
         {/* Temperature Range */}
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, gap: 2 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Thermostat sx={{ color: 'rgba(255,255,255,0.7)' }} />
+            <Thermostat sx={{ color: colors.weather.overlay.text.muted }} />
             <Typography variant="body1">
-              Feels like {weatherApiService.formatTemperature(weatherApiService.getFeelsLikeTemp(weatherData))}
+              {t('weather.feelsLike')} {weatherApiService.formatTemperature(weatherApiService.getFeelsLikeTemp(weatherData))}
             </Typography>
           </Box>
-          <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-            H: {weatherApiService.formatTemperature(maxTemp)} 
-            L: {weatherApiService.formatTemperature(minTemp)}
+          <Typography variant="body1" sx={{ color: colors.weather.overlay.text.muted }}>
+            {t('weather.high')} {weatherApiService.formatTemperature(maxTemp)} 
+            {t('weather.low')} {weatherApiService.formatTemperature(minTemp)}
           </Typography>
         </Box>
 
         {showDetails && (
           <>
-            <Divider sx={{ backgroundColor: 'rgba(255,255,255,0.2)', mb: 3 }} />
+            <Divider sx={{ backgroundColor: colors.weather.overlay.primary, mb: 3 }} />
 
             {/* Weather Details Grid */}
             <Box 
@@ -135,22 +136,22 @@ export function WeatherCard({ weatherData, showDetails = true }: WeatherCardProp
               }}
             >
               <Box sx={{ textAlign: 'center' }}>
-                <Air sx={{ fontSize: 24, mb: 1, color: 'rgba(255,255,255,0.7)' }} />
-                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                  Wind Speed
+                <Air sx={{ fontSize: 24, mb: 1, color: colors.weather.overlay.text.muted }} />
+                <Typography variant="body2" sx={{ color: colors.weather.overlay.text.muted }}>
+                  {t('weather.details.windSpeed')}
                 </Typography>
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
                   {weatherApiService.formatWindSpeed(current.wind_kph)}
                 </Typography>
-                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)' }}>
+                <Typography variant="caption" sx={{ color: colors.weather.overlay.text.subtle }}>
                   {current.wind_dir}
                 </Typography>
               </Box>
 
               <Box sx={{ textAlign: 'center' }}>
-                <WaterDrop sx={{ fontSize: 24, mb: 1, color: 'rgba(255,255,255,0.7)' }} />
-                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                  Humidity
+                <WaterDrop sx={{ fontSize: 24, mb: 1, color: colors.weather.overlay.text.muted }} />
+                <Typography variant="body2" sx={{ color: colors.weather.overlay.text.muted }}>
+                  {t('weather.details.humidity')}
                 </Typography>
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
                   {current.humidity}%
@@ -158,9 +159,9 @@ export function WeatherCard({ weatherData, showDetails = true }: WeatherCardProp
               </Box>
 
               <Box sx={{ textAlign: 'center' }}>
-                <Speed sx={{ fontSize: 24, mb: 1, color: 'rgba(255,255,255,0.7)' }} />
-                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                  Pressure
+                <Speed sx={{ fontSize: 24, mb: 1, color: colors.weather.overlay.text.muted }} />
+                <Typography variant="body2" sx={{ color: colors.weather.overlay.text.muted }}>
+                  {t('weather.details.pressure')}
                 </Typography>
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
                   {weatherApiService.formatPressure(current.pressure_mb)}
@@ -168,9 +169,9 @@ export function WeatherCard({ weatherData, showDetails = true }: WeatherCardProp
               </Box>
 
               <Box sx={{ textAlign: 'center' }}>
-                <Visibility sx={{ fontSize: 24, mb: 1, color: 'rgba(255,255,255,0.7)' }} />
-                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                  Visibility
+                <Visibility sx={{ fontSize: 24, mb: 1, color: colors.weather.overlay.text.muted }} />
+                <Typography variant="body2" sx={{ color: colors.weather.overlay.text.muted }}>
+                  {t('weather.details.visibility')}
                 </Typography>
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
                   {weatherApiService.formatVisibility(current.vis_km)}
@@ -178,9 +179,9 @@ export function WeatherCard({ weatherData, showDetails = true }: WeatherCardProp
               </Box>
 
               <Box sx={{ textAlign: 'center' }}>
-                <Cloud sx={{ fontSize: 24, mb: 1, color: 'rgba(255,255,255,0.7)' }} />
-                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                  Cloud Cover
+                <Cloud sx={{ fontSize: 24, mb: 1, color: colors.weather.overlay.text.muted }} />
+                <Typography variant="body2" sx={{ color: colors.weather.overlay.text.muted }}>
+                  {t('weather.details.cloudCover')}
                 </Typography>
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
                   {current.cloud}%
@@ -188,9 +189,9 @@ export function WeatherCard({ weatherData, showDetails = true }: WeatherCardProp
               </Box>
 
               <Box sx={{ textAlign: 'center' }}>
-                <WbSunny sx={{ fontSize: 24, mb: 1, color: 'rgba(255,255,255,0.7)' }} />
-                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                  UV Index
+                <WbSunny sx={{ fontSize: 24, mb: 1, color: colors.weather.overlay.text.muted }} />
+                <Typography variant="body2" sx={{ color: colors.weather.overlay.text.muted }}>
+                  {t('weather.details.uvIndex')}
                 </Typography>
                 <Typography variant="h6" sx={{ fontWeight: 600 }}>
                   {current.uv}
@@ -201,9 +202,9 @@ export function WeatherCard({ weatherData, showDetails = true }: WeatherCardProp
               {weatherData.forecast?.forecastday?.[0]?.astro && (
                 <>
                   <Box sx={{ textAlign: 'center' }}>
-                    <WbSunny sx={{ fontSize: 24, mb: 1, color: 'rgba(255,255,255,0.7)' }} />
-                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                      Sunrise
+                    <WbSunny sx={{ fontSize: 24, mb: 1, color: colors.weather.overlay.text.muted }} />
+                    <Typography variant="body2" sx={{ color: colors.weather.overlay.text.muted }}>
+                      {t('weather.details.sunrise')}
                     </Typography>
                     <Typography variant="h6" sx={{ fontWeight: 600 }}>
                       {sunrise}
@@ -211,9 +212,9 @@ export function WeatherCard({ weatherData, showDetails = true }: WeatherCardProp
                   </Box>
 
                   <Box sx={{ textAlign: 'center' }}>
-                    <NightsStay sx={{ fontSize: 24, mb: 1, color: 'rgba(255,255,255,0.7)' }} />
-                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                      Sunset
+                    <NightsStay sx={{ fontSize: 24, mb: 1, color: colors.weather.overlay.text.muted }} />
+                    <Typography variant="body2" sx={{ color: colors.weather.overlay.text.muted }}>
+                      {t('weather.details.sunset')}
                     </Typography>
                     <Typography variant="h6" sx={{ fontWeight: 600 }}>
                       {sunset}

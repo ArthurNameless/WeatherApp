@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { SearchHistoryItem, WeatherResponse } from '../types/weather';
-import { LocalStorageService } from '../utils/localStorage';
+import type { SearchHistoryItem, WeatherResponse } from '@Types/weather';
+import { LocalStorageService } from '@Utils/localStorage';
 
 interface UseSearchHistoryReturn {
   searchHistory: SearchHistoryItem[];

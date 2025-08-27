@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   TextField,
   Button,
@@ -8,7 +9,6 @@ import {
   Alert
 } from '@mui/material';
 import { Search as SearchIcon, MyLocation as LocationIcon } from '@mui/icons-material';
-// import { debounce } from 'lodash'; // For future use
 
 interface SearchBoxProps {
   onSearch: (cityName: string) => void;
@@ -24,11 +24,14 @@ export function SearchBox({
   onLocationSearch,
   loading = false,
   error = null,
-  placeholder = "Enter city name...",
+  placeholder,
   disabled = false
 }: SearchBoxProps) {
+  const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
+  
+  const defaultPlaceholder = placeholder || t('search.placeholder');
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -37,19 +40,19 @@ export function SearchBox({
     
     // Validate input
     if (value.length > 0 && value.length < 2) {
-      setLocalError('City name must be at least 2 characters long');
+      setLocalError(t('search.errors.minLength'));
       return;
     }
     
     if (value.length > 50) {
-      setLocalError('City name is too long');
+      setLocalError(t('search.errors.maxLength'));
       return;
     }
     
     // Check for invalid characters
     const invalidChars = /[^a-zA-Z\s\-',]/;
     if (invalidChars.test(value)) {
-      setLocalError('City name contains invalid characters');
+      setLocalError(t('search.errors.invalidCharacters'));
       return;
     }
     
@@ -61,7 +64,7 @@ export function SearchBox({
     event.preventDefault();
     
     if (!searchValue.trim()) {
-      setLocalError('Please enter a city name');
+      setLocalError(t('search.errors.enterCity'));
       return;
     }
     
@@ -93,7 +96,7 @@ export function SearchBox({
         <TextField
           fullWidth
           variant="outlined"
-          placeholder={placeholder}
+          placeholder={defaultPlaceholder}
           value={searchValue}
           onChange={handleInputChange}
           disabled={disabled || loading}
@@ -141,7 +144,7 @@ export function SearchBox({
               fontWeight: 600
             }}
           >
-            {loading ? <CircularProgress size={20} color="inherit" /> : 'Search'}
+            {loading ? <CircularProgress size={20} color="inherit" /> : t('search.button')}
           </Button>
           
           {onLocationSearch && (
@@ -158,7 +161,7 @@ export function SearchBox({
                 fontWeight: 600
               }}
             >
-              My Location
+              {t('search.myLocation')}
             </Button>
           )}
         </Box>

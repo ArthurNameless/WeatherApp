@@ -2,7 +2,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ThemeProvider, createTheme } from '@mui/material';
-import { SearchBox } from '../../../src/components/common/SearchBox';
+import { SearchBox } from '@Components/common/SearchBox';
 
 const theme = createTheme();
 

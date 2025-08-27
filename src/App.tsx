@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
+import { useTranslation } from 'react-i18next';
 import {
   ThemeProvider,
-  createTheme,
   CssBaseline,
   Container,
   Box,
@@ -12,19 +12,23 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { Brightness4, Brightness7 } from "@mui/icons-material";
-import { SearchBox } from "./components/common/SearchBox";
-import { WeatherCard } from "./components/weather/WeatherCard";
-import { SearchHistory } from "./components/common/SearchHistory";
-import { useWeather } from "./hooks/useWeather";
-import { useSearchHistory } from "./hooks/useSearchHistory";
-import { weatherApiService } from "./services/weatherApi";
+import { SearchBox } from "@Components/common/SearchBox";
+import { WeatherCard } from "@Components/weather/WeatherCard";
+import { SearchHistory } from "@Components/common/SearchHistory";
+import { useWeather } from "@Hooks/useWeather";
+import { useSearchHistory } from "@Hooks/useSearchHistory";
+import { weatherApiService } from "@Services/weatherApi";
+import { createAppTheme } from "@Theme/theme";
+import { getAppStyles } from "@Theme/appStyles";
+import { syncCSSColors } from "@Theme/colorSync";
 import type {
   SearchHistoryItem,
   WeatherResponse,
   ApiError,
-} from "./types/weather";
+} from "@Types/weather";
 
 function App() {
+  const { t } = useTranslation();
   const [darkMode, setDarkMode] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -64,30 +68,13 @@ function App() {
     setDarkMode(prefersDarkMode);
   }, [prefersDarkMode]);
 
-  const theme = createTheme({
-    palette: {
-      mode: darkMode ? "dark" : "light",
-      primary: {
-        main: darkMode ? "#90caf9" : "#1976d2",
-      },
-      secondary: {
-        main: darkMode ? "#f48fb1" : "#dc004e",
-      },
-      background: {
-        default: darkMode ? "#121212" : "#f5f5f5",
-        paper: darkMode ? "#1e1e1e" : "#ffffff",
-      },
-    },
-    components: {
-      MuiCard: {
-        styleOverrides: {
-          root: {
-            borderRadius: 16,
-          },
-        },
-      },
-    },
-  });
+  // Sync CSS colors when dark mode changes
+  useEffect(() => {
+    syncCSSColors(darkMode ? 'dark' : 'light');
+  }, [darkMode]);
+
+  const theme = createAppTheme(darkMode);
+  const styles = getAppStyles(darkMode);
 
   const handleSearch = useCallback(
     async (cityName: string) => {
@@ -117,7 +104,7 @@ function App() {
     setLocationError(null);
 
     if (!navigator.geolocation) {
-      setLocationError("Geolocation is not supported by this browser");
+      setLocationError(t('search.errors.geolocationNotSupported'));
       return;
     }
 
@@ -135,24 +122,22 @@ function App() {
         } catch (error) {
           setLocalLoading(false);
           setLocalError(error as ApiError);
-          setLocationError("Failed to fetch weather for your location");
+          setLocationError(t('search.errors.locationFailed'));
         }
       },
       (error) => {
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            setLocationError("Location access denied by user");
+            setLocationError(t('search.errors.permissionDenied'));
             break;
           case error.POSITION_UNAVAILABLE:
-            setLocationError("Location information is unavailable");
+            setLocationError(t('search.errors.positionUnavailable'));
             break;
           case error.TIMEOUT:
-            setLocationError("Location request timed out");
+            setLocationError(t('search.errors.timeout'));
             break;
           default:
-            setLocationError(
-              "An unknown error occurred while retrieving location"
-            );
+            setLocationError(t('search.errors.unknownLocationError'));
             break;
         }
       },
@@ -174,7 +159,7 @@ function App() {
   const handleHistoryItemRemove = useCallback(
     (itemId: string) => {
       removeFromHistory(itemId);
-      setSnackbarMessage("Item removed from history");
+      setSnackbarMessage(t('notifications.itemRemoved'));
       setSnackbarOpen(true);
     },
     [removeFromHistory]
@@ -183,7 +168,7 @@ function App() {
   const handleHistoryItemRestore = useCallback(
     (itemId: string) => {
       restoreItem(itemId);
-      setSnackbarMessage("Item restored to history");
+      setSnackbarMessage(t('notifications.itemRestored'));
       setSnackbarOpen(true);
     },
     [restoreItem]
@@ -191,7 +176,7 @@ function App() {
 
   const handleClearHistory = useCallback(() => {
     clearHistory();
-    setSnackbarMessage("Search history cleared");
+    setSnackbarMessage(t('notifications.historyCleared'));
     setSnackbarOpen(true);
   }, [clearHistory]);
 
@@ -218,49 +203,30 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box
-        sx={{
-          minHeight: "100vh",
-          width: "100%",
-
-          background: darkMode
-            ? "linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)"
-            : "linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)",
-        }}
-      >
-        <Container maxWidth="lg" sx={{ py: 4, maxWidth: 600, margin: "auto", border: "2px solid rgb(126, 124, 124)", borderRadius: 8 }}>
+      <Box sx={styles.mainContainer}>
+        <Container maxWidth="lg" sx={styles.contentContainer}>
           {/* Header */}
-          <Box sx={{ textAlign: "center", mb: 4 }}>
+          <Box sx={styles.headerContainer}>
             <Typography
               variant="h2"
               component="h1"
-              sx={{
-                fontWeight: 700,
-                background: darkMode
-                  ? "linear-gradient(45deg, #90caf9, #f48fb1)"
-                  : "linear-gradient(45deg, #1976d2, #dc004e)",
-                backgroundClip: "text",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                textAlign: "center",
-                mb: 1,
-              }}
+              sx={styles.headerTitle(darkMode)}
             >
-              Weather Forecast
+              {t('app.title')}
             </Typography>
             <Typography variant="h6" color="text.secondary">
-              Get current weather information for any city worldwide
+              {t('app.subtitle')}
             </Typography>
           </Box>
 
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+          <Box sx={styles.mainContentContainer}>
             {/* Search Section */}
             <SearchBox
               onSearch={handleSearch}
               onLocationSearch={handleLocationSearch}
               loading={currentLoading}
               error={currentError?.message || locationError}
-              placeholder="Enter city name (e.g., London, Tokyo, New York)"
+              placeholder={t('search.placeholder')}
             />
 
             {/* Weather Display */}
@@ -282,13 +248,9 @@ function App() {
           {/* Dark Mode Toggle */}
           <Fab
             color="primary"
-            aria-label="toggle dark mode"
+            aria-label={t('app.darkModeToggle')}
             onClick={toggleDarkMode}
-            sx={{
-              position: "fixed",
-              bottom: 24,
-              right: 24,
-            }}
+            sx={styles.darkModeToggle}
           >
             {darkMode ? <Brightness7 /> : <Brightness4 />}
           </Fab>
@@ -299,7 +261,7 @@ function App() {
           open={snackbarOpen}
           autoHideDuration={3000}
           onClose={handleSnackbarClose}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          anchorOrigin={styles.snackbarAnchor}
         >
           <Alert
             onClose={handleSnackbarClose}

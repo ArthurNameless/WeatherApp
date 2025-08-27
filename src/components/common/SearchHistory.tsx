@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Card,
   CardContent,
@@ -26,7 +27,7 @@ import {
   Undo,
   LocationOn
 } from '@mui/icons-material';
-import type { SearchHistoryItem } from '../../types/weather';
+import type { SearchHistoryItem } from '@Types/weather';
 
 interface SearchHistoryProps {
   searchHistory: SearchHistoryItem[];
@@ -45,6 +46,7 @@ export function SearchHistory({
   onItemRestore,
   onClearHistory
 }: SearchHistoryProps) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(true);
   const [showRemoved, setShowRemoved] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -74,15 +76,15 @@ export function SearchHistory({
       const now = new Date();
       const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
       
-      if (diffInHours < 1) return 'Just now';
-      if (diffInHours < 24) return `${diffInHours} hour${diffInHours === 1 ? '' : 's'} ago`;
+      if (diffInHours < 1) return t('history.timeAgo.justNow');
+      if (diffInHours < 24) return t('history.timeAgo.hoursAgo', { count: diffInHours });
       
       const diffInDays = Math.floor(diffInHours / 24);
-      if (diffInDays < 7) return `${diffInDays} day${diffInDays === 1 ? '' : 's'} ago`;
+      if (diffInDays < 7) return t('history.timeAgo.daysAgo', { count: diffInDays });
       
       return date.toLocaleDateString();
     } catch {
-      return 'Recently';
+      return t('history.timeAgo.recently');
     }
   };
 
@@ -92,10 +94,10 @@ export function SearchHistory({
         <CardContent sx={{ textAlign: 'center', py: 4 }}>
           <History sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
           <Typography variant="h6" color="text.secondary">
-            No search history yet
+            {t('history.noHistory')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Search for a city to see it in your history
+            {t('history.noHistorySubtitle')}
           </Typography>
         </CardContent>
       </Card>
@@ -118,7 +120,7 @@ export function SearchHistory({
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <History color="primary" />
               <Typography variant="h6" component="h2">
-                Search History
+                {t('history.title')}
               </Typography>
               <Chip
                 label={searchHistory.length}
@@ -136,7 +138,7 @@ export function SearchHistory({
                   onClick={() => setShowRemoved(!showRemoved)}
                   sx={{ textTransform: 'none' }}
                 >
-                  Recently Removed ({removedItems.length})
+                  {t('history.recentlyRemoved')} ({removedItems.length})
                 </Button>
               )}
               
@@ -148,14 +150,14 @@ export function SearchHistory({
                   color="error"
                   sx={{ textTransform: 'none' }}
                 >
-                  Clear All
+                  {t('history.clearAll')}
                 </Button>
               )}
               
               <IconButton
                 size="small"
                 onClick={() => setExpanded(!expanded)}
-                aria-label={expanded ? 'Collapse' : 'Expand'}
+                aria-label={expanded ? t('history.collapse') : t('history.expand')}
               >
                 {expanded ? <ExpandLess /> : <ExpandMore />}
               </IconButton>
@@ -233,7 +235,7 @@ export function SearchHistory({
                 color="text.secondary"
                 sx={{ textAlign: 'center', py: 2 }}
               >
-                No items in search history
+                {t('history.noItems')}
               </Typography>
             )}
 
@@ -242,7 +244,7 @@ export function SearchHistory({
               <>
                 <Divider sx={{ my: 2 }} />
                 <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
-                  Recently Removed
+                  {t('history.recentlyRemoved')}
                 </Typography>
                 <List disablePadding>
                   {removedItems.map((item) => (
@@ -268,7 +270,7 @@ export function SearchHistory({
                               {item.cityName}
                             </Typography>
                           }
-                          secondary="Click to restore"
+                          secondary={t('history.clickToRestore')}
                         />
                       </ListItemButton>
                     </ListItem>
@@ -292,11 +294,11 @@ export function SearchHistory({
           severity="info"
           action={
             <Button color="inherit" size="small" onClick={handleUndo}>
-              Undo
+              {t('history.undo')}
             </Button>
           }
         >
-          Removed "{lastRemovedItem?.cityName}" from search history
+          {t('history.removedFromHistory', { cityName: lastRemovedItem?.cityName })}
         </Alert>
       </Snackbar>
     </>

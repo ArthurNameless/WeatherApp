@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import axios from 'axios';
-import { weatherApiService } from '../../../src/services/weatherApi';
+import { weatherApiService } from '@Services/weatherApi';
 
 // Mock axios
 vi.mock('axios');
-const mockedAxios = vi.mocked(axios);
+const mockedAxios = vi.mocked(axios, true);
 
 describe('WeatherApiService', () => {
   beforeEach(() => {
@@ -21,7 +21,7 @@ describe('WeatherApiService', () => {
         },
       },
     };
-    mockedAxios.create.mockReturnValue(mockAxiosInstance as any);
+    (mockedAxios.create as any).mockReturnValue(mockAxiosInstance);
   });
 
   describe('getCurrentWeather', () => {

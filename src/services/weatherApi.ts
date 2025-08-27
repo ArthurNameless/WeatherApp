@@ -1,5 +1,5 @@
 import axios, { AxiosError, type AxiosResponse } from 'axios';
-import type { WeatherResponse, ApiError, WeatherApiConfig } from '../types/weather';
+import type { WeatherResponse, ApiError, WeatherApiConfig } from '@Types/weather';
 
 class WeatherApiService {
   private config: WeatherApiConfig;
