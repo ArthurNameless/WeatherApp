@@ -7,18 +7,11 @@
   "search": {
     "placeholder": "Enter city name (e.g., London, Tokyo, New York)",
     "button": "Search",
-    "myLocation": "My Location",
     "errors": {
       "minLength": "City name must be at least 2 characters long",
       "maxLength": "City name is too long",
       "invalidCharacters": "City name contains invalid characters",
-      "enterCity": "Please enter a city name",
-      "geolocationNotSupported": "Geolocation is not supported by this browser",
-      "locationFailed": "Failed to fetch weather for your location",
-      "permissionDenied": "Location access denied by user",
-      "positionUnavailable": "Location information is unavailable",
-      "timeout": "Location request timed out",
-      "unknownLocationError": "An unknown error occurred while retrieving location"
+      "enterCity": "Please enter a city name"
     }
   },
   "weather": {

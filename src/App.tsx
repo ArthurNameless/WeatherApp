@@ -17,7 +17,6 @@ import { SearchBox } from "@Components/common/SearchBox";
 import { WeatherCard } from "@Components/weather/WeatherCard";
 import { SearchHistory } from "@Components/common/SearchHistory";
 import { useSearch } from "@Hooks/useSearch";
-import { useSearchHistory } from "@Hooks/useSearchHistory";
 import { createAppTheme } from "@Theme/theme";
 import { getAppStyles } from "@Theme/appStyles";
 import { syncCSSColors } from "@Theme/colorSync";
@@ -37,7 +36,6 @@ function App() {
     data: weatherData,
     loading,
     error: weatherError,
-    locationError,
     handleSearch,
     clearError,
   } = useSearch();
@@ -45,11 +43,10 @@ function App() {
   const {
     searchHistory,
     removedItems,
-    addToHistory,
     removeFromHistory,
     restoreItem,
     clearHistory,
-  } = useSearchHistory();
+  } = useSearch();
 
   // Initialize dark mode based on system preference
   useEffect(() => {
@@ -95,17 +92,6 @@ function App() {
     setSnackbarOpen(true);
   }, [clearHistory, t]);
 
-  // Add successful search to history
-  useEffect(() => {
-    if (weatherData) {
-      addToHistory(
-        weatherData.location.name,
-        weatherData.location.country,
-        weatherData.location.region,
-        weatherData
-      );
-    }
-  }, [weatherData, addToHistory]);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -139,7 +125,7 @@ function App() {
             <SearchBox
               onSearch={handleSearch}
               loading={loading}
-              error={weatherError?.message || locationError}
+              error={weatherError?.message}
               placeholder={t('search.placeholder')}
               onErrorClear={clearError}
             />

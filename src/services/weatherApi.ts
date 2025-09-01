@@ -34,6 +34,8 @@ export const getCurrentWeather = async (cityName: string): Promise<WeatherRespon
   }
 }
 
+
+
 export const getForecast = async (cityName: string, days: number = 1): Promise<WeatherResponse> => {
   
   if (!cityName || cityName.trim().length === 0) {

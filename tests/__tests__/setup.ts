@@ -9,18 +9,6 @@ Object.defineProperty(import.meta, 'env', {
   writable: true
 });
 
-// Mock geolocation
-const mockGeolocation = {
-  getCurrentPosition: vi.fn(),
-  watchPosition: vi.fn(),
-  clearWatch: vi.fn(),
-};
-
-Object.defineProperty(globalThis.navigator, 'geolocation', {
-  value: mockGeolocation,
-  writable: true,
-});
-
 // Mock localStorage
 const localStorageMock = {
   getItem: vi.fn(),

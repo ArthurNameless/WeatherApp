@@ -137,3 +137,31 @@ export const restoreFromRemoved = (itemId: string): boolean => {
 export const clearRemovedItems = (): void => {
   safeRemoveItem(STORAGE_KEYS.REMOVED_ITEMS);
 };
+
+// Check if localStorage is available
+export const isLocalStorageAvailable = (): boolean => {
+  try {
+    const testKey = '__localStorage_test__';
+    localStorage.setItem(testKey, 'test');
+    localStorage.removeItem(testKey);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+// Create a service class for test compatibility
+export const LocalStorageService = {
+  isLocalStorageAvailable,
+  safeGetItem,
+  safeSetItem,
+  safeRemoveItem,
+  getSearchHistory,
+  addToSearchHistory,
+  removeFromSearchHistory,
+  clearSearchHistory,
+  getRemovedItems,
+  addToRemovedItems,
+  restoreFromRemoved,
+  clearRemovedItems
+};
