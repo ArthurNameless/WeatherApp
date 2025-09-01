@@ -39,7 +39,7 @@ function App() {
     error: weatherError,
     locationError,
     handleSearch,
-    handleLocationSearch,
+    clearError,
   } = useSearch();
 
   const {
@@ -138,10 +138,10 @@ function App() {
             {/* Search Section */}
             <SearchBox
               onSearch={handleSearch}
-              onLocationSearch={handleLocationSearch}
               loading={loading}
               error={weatherError?.message || locationError}
               placeholder={t('search.placeholder')}
+              onErrorClear={clearError}
             />
 
             {/* Weather Display */}

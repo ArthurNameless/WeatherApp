@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { SearchHistoryItem, WeatherResponse } from '@Types/weather';
-import { LocalStorageService } from '@Utils/localStorage';
+import { getSearchHistory, getRemovedItems, addToSearchHistory, removeFromSearchHistory, clearSearchHistory, clearRemovedItems, restoreFromRemoved } from '@Utils/localStorage';
 
 interface UseSearchHistoryReturn {
   searchHistory: SearchHistoryItem[];
@@ -20,9 +20,9 @@ export function useSearchHistory(): UseSearchHistoryReturn {
   useEffect(() => {
     const loadData = () => {
       try {
-        const history = LocalStorageService.getSearchHistory();
-        const removed = LocalStorageService.getRemovedItems();
-        
+        const history = getSearchHistory();
+        const removed = getRemovedItems();
+
         setSearchHistory(history);
         setRemovedItems(removed);
       } catch (error) {
@@ -34,8 +34,8 @@ export function useSearchHistory(): UseSearchHistoryReturn {
   }, []);
 
   const addToHistory = useCallback((
-    cityName: string, 
-    country: string, 
+    cityName: string,
+    country: string,
     region: string = '',
     weatherData?: WeatherResponse
   ) => {
@@ -53,8 +53,8 @@ export function useSearchHistory(): UseSearchHistoryReturn {
     };
 
     try {
-      LocalStorageService.addToSearchHistory(newItem);
-      const updatedHistory = LocalStorageService.getSearchHistory();
+      addToSearchHistory(newItem);
+      const updatedHistory = getSearchHistory();
       setSearchHistory(updatedHistory);
     } catch (error) {
       console.error('Error adding to search history:', error);
@@ -63,12 +63,12 @@ export function useSearchHistory(): UseSearchHistoryReturn {
 
   const removeFromHistory = useCallback((itemId: string) => {
     try {
-      const removedItem = LocalStorageService.removeFromSearchHistory(itemId);
-      
+      const removedItem = removeFromSearchHistory(itemId);
+
       if (removedItem) {
-        const updatedHistory = LocalStorageService.getSearchHistory();
-        const updatedRemoved = LocalStorageService.getRemovedItems();
-        
+        const updatedHistory = getSearchHistory();
+        const updatedRemoved = getRemovedItems();
+
         setSearchHistory(updatedHistory);
         setRemovedItems(updatedRemoved);
       }
@@ -79,12 +79,12 @@ export function useSearchHistory(): UseSearchHistoryReturn {
 
   const restoreItem = useCallback((itemId: string) => {
     try {
-      const restored = LocalStorageService.restoreFromRemoved(itemId);
-      
+      const restored = restoreFromRemoved(itemId);
+
       if (restored) {
-        const updatedHistory = LocalStorageService.getSearchHistory();
-        const updatedRemoved = LocalStorageService.getRemovedItems();
-        
+        const updatedHistory = getSearchHistory();
+        const updatedRemoved = getRemovedItems();
+
         setSearchHistory(updatedHistory);
         setRemovedItems(updatedRemoved);
       }
@@ -95,9 +95,9 @@ export function useSearchHistory(): UseSearchHistoryReturn {
 
   const clearHistory = useCallback(() => {
     try {
-      LocalStorageService.clearSearchHistory();
-      LocalStorageService.clearRemovedItems();
-      
+      clearSearchHistory();
+      clearRemovedItems();
+
       setSearchHistory([]);
       setRemovedItems([]);
     } catch (error) {

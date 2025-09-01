@@ -8,26 +8,26 @@ import {
   CircularProgress,
   Alert
 } from '@mui/material';
-import { Search as SearchIcon, MyLocation as LocationIcon } from '@mui/icons-material';
+import { Search as SearchIcon } from '@mui/icons-material';
 
 import { searchBoxStyles } from './SearchBox.styles';
 
 interface SearchBoxProps {
   onSearch: (cityName: string) => void;
-  onLocationSearch?: () => void;
   loading?: boolean;
   error?: string | null;
   placeholder?: string;
   disabled?: boolean;
+  onErrorClear?: () => void;
 }
 
 export function SearchBox({
   onSearch,
-  onLocationSearch,
   loading = false,
   error = null,
   placeholder,
-  disabled = false
+  disabled = false,
+  onErrorClear
 }: SearchBoxProps) {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
@@ -39,6 +39,11 @@ export function SearchBox({
     const value = event.target.value;
     setSearchValue(value);
     setLocalError(null);
+    
+    // Clear API error when user starts typing
+    if (error && onErrorClear) {
+      onErrorClear();
+    }
     
     // Validate input
     if (value.length > 0 && value.length < 2) {
@@ -75,12 +80,6 @@ export function SearchBox({
     }
     
     onSearch(searchValue.trim());
-  };
-
-  const handleLocationSearch = () => {
-    if (onLocationSearch) {
-      onLocationSearch();
-    }
   };
 
   const displayError = error || localError;
@@ -121,18 +120,6 @@ export function SearchBox({
           >
             {loading ? <CircularProgress size={20} color="inherit" /> : t('search.button')}
           </Button>
-          
-          {onLocationSearch && (
-            <Button
-              variant="outlined"
-              onClick={handleLocationSearch}
-              disabled={disabled || loading}
-              startIcon={<LocationIcon />}
-              sx={searchBoxStyles.locationButton}
-            >
-              {t('search.myLocation')}
-            </Button>
-          )}
         </Box>
       </Box>
       

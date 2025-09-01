@@ -1,4 +1,5 @@
 import type { SxProps, Theme } from "@mui/material";
+
 import { colorHelpers, colors } from './colors';
 
 export const getAppStyles = (darkMode: boolean) => {

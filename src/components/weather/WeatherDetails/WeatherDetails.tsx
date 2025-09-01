@@ -15,7 +15,7 @@ import {
   formatPressure,
   formatVisibility,
 } from "@Services/weatherApi";
-import { SunTimes } from "./SunTimes";
+import { SunTimes } from "../SunTimes";
 
 interface WeatherDetailsProps {
   current: WeatherResponse['current'];

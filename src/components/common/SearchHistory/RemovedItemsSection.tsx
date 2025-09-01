@@ -1,4 +1,3 @@
-
 import { useTranslation } from 'react-i18next';
 import {
   List,
@@ -9,6 +8,7 @@ import {
   Divider
 } from '@mui/material';
 import { Undo } from '@mui/icons-material';
+
 import type { SearchHistoryItem } from '@Types/weather';
 import { searchHistoryStyles } from '../SearchHistory.styles';
 

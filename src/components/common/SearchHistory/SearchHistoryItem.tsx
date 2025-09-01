@@ -14,6 +14,7 @@ import {
   Delete,
   LocationOn
 } from '@mui/icons-material';
+
 import type { SearchHistoryItem } from '@Types/weather';
 import { searchHistoryStyles } from '../SearchHistory.styles';
 

@@ -8,6 +8,7 @@ import {
   Collapse,
   Divider
 } from '@mui/material';
+
 import type { SearchHistoryItem } from '@Types/weather';
 import { searchHistoryStyles } from '../SearchHistory.styles';
 import { EmptyState } from './EmptyState';

@@ -14,74 +14,6 @@ export const createWeatherCardStyles = (isDay: boolean) => {
     p: 3
   };
 
-  const headerBoxStyles: SxProps<Theme> = {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    mb: 2
-  };
-
-  const locationNameStyles: SxProps<Theme> = {
-    fontWeight: 700,
-    color: 'white'
-  };
-
-  const locationSubtitleStyles: SxProps<Theme> = {
-    color: colors.weather.overlay.text.secondary
-  };
-
-  const conditionChipStyles: SxProps<Theme> = {
-    backgroundColor: colors.weather.overlay.primary,
-    color: colors.ui.white,
-    fontWeight: 600,
-    backdropFilter: 'blur(10px)'
-  };
-
-  const mainWeatherBoxStyles: SxProps<Theme> = {
-    display: 'flex',
-    alignItems: 'center',
-    mb: 3
-  };
-
-  const weatherIconStyles: SxProps<Theme> = {
-    width: 80,
-    height: 80,
-    mr: 3,
-    backgroundColor: colors.weather.overlay.secondary,
-    backdropFilter: 'blur(10px)'
-  };
-
-  const temperatureStyles: SxProps<Theme> = {
-    fontWeight: 300,
-    lineHeight: 1
-  };
-
-  const conditionTextStyles: SxProps<Theme> = {
-    textTransform: 'capitalize',
-    color: colors.weather.overlay.text.primary
-  };
-
-  const temperatureRangeBoxStyles: SxProps<Theme> = {
-    display: 'flex',
-    alignItems: 'center',
-    mb: 3,
-    gap: 2
-  };
-
-  const feelsLikeBoxStyles: SxProps<Theme> = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 1
-  };
-
-  const thermostatIconStyles: SxProps<Theme> = {
-    color: colors.weather.overlay.text.muted
-  };
-
-  const temperatureRangeTextStyles: SxProps<Theme> = {
-    color: colors.weather.overlay.text.muted
-  };
-
   const dividerStyles: SxProps<Theme> = {
     backgroundColor: colors.weather.overlay.primary,
     mb: 3
@@ -118,18 +50,6 @@ export const createWeatherCardStyles = (isDay: boolean) => {
   return {
     cardStyles,
     cardContentStyles,
-    headerBoxStyles,
-    locationNameStyles,
-    locationSubtitleStyles,
-    conditionChipStyles,
-    mainWeatherBoxStyles,
-    weatherIconStyles,
-    temperatureStyles,
-    conditionTextStyles,
-    temperatureRangeBoxStyles,
-    feelsLikeBoxStyles,
-    thermostatIconStyles,
-    temperatureRangeTextStyles,
     dividerStyles,
     detailsGridStyles,
     detailItemBoxStyles,

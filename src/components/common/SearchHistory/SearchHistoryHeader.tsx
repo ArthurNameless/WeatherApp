@@ -14,6 +14,7 @@ import {
   Clear,
   Undo
 } from '@mui/icons-material';
+
 import { searchHistoryStyles } from '../SearchHistory.styles';
 
 interface SearchHistoryHeaderProps {

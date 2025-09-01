@@ -1,6 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import { WbSunny, NightsStay } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
+
 import { colors } from "@Theme/colors";
 import { sunTimesStyles } from "./SunTimes.styles";
 

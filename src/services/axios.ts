@@ -3,7 +3,7 @@ import type { ApiError, WeatherApiConfig } from '@Types/weather';
 
 // Configuration
 const config: WeatherApiConfig = {
-  apiKey: import.meta.env.VITE_WEATHER_API_KEY || 'b4aee53d9f3841a5be0123646252608',
+  apiKey: import.meta.env.VITE_WEATHER_API_KEY,
   baseUrl: 'https://api.weatherapi.com/v1',
   units: 'celsius'
 };
@@ -105,21 +105,6 @@ axiosInstance.interceptors.response.use(
     return Promise.reject(handleApiError(error));
   }
 );
-
-// Export functions
-export const getAxiosInstance = (): AxiosInstance => {
-  return axiosInstance;
-};
-
-export const getConfig = (): WeatherApiConfig => {
-  return config;
-};
-
-export const validateApiKey = (): void => {
-  if (!config.apiKey) {
-    throw new Error('Weather API key is required. Please set VITE_WEATHER_API_KEY environment variable.');
-  }
-};
 
 // Export the instance and config for direct access
 export { axiosInstance, config };

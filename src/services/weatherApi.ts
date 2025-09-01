@@ -1,5 +1,5 @@
 import type { WeatherResponse } from '@Types/weather';
-import { getAxiosInstance, getConfig, validateApiKey } from './axios';
+import { axiosInstance, config } from './axios';
 
 // Helper function to sanitize city names
 const sanitizeCityName = (cityName: string): string => {
@@ -8,7 +8,6 @@ const sanitizeCityName = (cityName: string): string => {
 
 // API Functions
 export const getCurrentWeather = async (cityName: string): Promise<WeatherResponse> => {
-  validateApiKey();
   
   if (!cityName || cityName.trim().length === 0) {
     throw new Error('City name is required');
@@ -21,7 +20,6 @@ export const getCurrentWeather = async (cityName: string): Promise<WeatherRespon
   }
 
   try {
-    const axiosInstance = getAxiosInstance();
     const response = await axiosInstance.get<WeatherResponse>('/current.json', {
       params: {
         q: sanitizedCityName,
@@ -36,31 +34,7 @@ export const getCurrentWeather = async (cityName: string): Promise<WeatherRespon
   }
 }
 
-export const getCurrentWeatherByCoords = async (lat: number, lon: number): Promise<WeatherResponse> => {
-  validateApiKey();
-
-  if (!lat || !lon || lat < -90 || lat > 90 || lon < -180 || lon > 180) {
-    throw new Error('Invalid coordinates provided');
-  }
-
-  try {
-    const axiosInstance = getAxiosInstance();
-    const response = await axiosInstance.get<WeatherResponse>('/current.json', {
-      params: {
-        q: `${lat},${lon}`,
-        aqi: 'no'
-      }
-    });
-
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching weather data by coordinates:', error);
-    throw error;
-  }
-}
-
 export const getForecast = async (cityName: string, days: number = 1): Promise<WeatherResponse> => {
-  validateApiKey();
   
   if (!cityName || cityName.trim().length === 0) {
     throw new Error('City name is required');
@@ -76,7 +50,6 @@ export const getForecast = async (cityName: string, days: number = 1): Promise<W
   const validDays = Math.min(Math.max(days, 1), 10);
 
   try {
-    const axiosInstance = getAxiosInstance();
     const response = await axiosInstance.get<WeatherResponse>('/forecast.json', {
       params: {
         q: sanitizedCityName,
@@ -104,7 +77,6 @@ export const getWeatherIconUrl = (iconCode: string): string => {
 }
 
 export const formatTemperature = (temp: number): string => {
-  const config = getConfig();
   if (config.units === 'fahrenheit') {
     return `${Math.round(temp)}°F`;
   }
@@ -141,7 +113,6 @@ export const formatTime = (timeString: string): string => {
 
 // Helper function to get current temperature based on units
 export const getCurrentTemp = (weatherData: WeatherResponse): number => {
-  const config = getConfig();
   return config.units === 'fahrenheit' 
     ? weatherData.current.temp_f 
     : weatherData.current.temp_c;
@@ -149,7 +120,6 @@ export const getCurrentTemp = (weatherData: WeatherResponse): number => {
 
 // Helper function to get feels like temperature
 export const getFeelsLikeTemp = (weatherData: WeatherResponse): number => {
-  const config = getConfig();
   return config.units === 'fahrenheit' 
     ? weatherData.current.feelslike_f 
     : weatherData.current.feelslike_c;
@@ -163,7 +133,6 @@ export const getMinMaxTemp = (weatherData: WeatherResponse): { min: number; max:
     return { min: currentTemp, max: currentTemp };
   }
 
-  const config = getConfig();
   const today = weatherData.forecast.forecastday[0].day;
   return config.units === 'fahrenheit'
     ? { min: today.mintemp_f, max: today.maxtemp_f }
@@ -186,7 +155,6 @@ export const getSunTimes = (weatherData: WeatherResponse): { sunrise: string; su
 // For backward compatibility, export all functions as a single object
 export const weatherApi = {
   getCurrentWeather,
-  getCurrentWeatherByCoords,
   getForecast,
   getWeatherIconUrl,
   formatTemperature,

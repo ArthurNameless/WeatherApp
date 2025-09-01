@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import type { WeatherResponse, ApiError } from '@Types/weather';
-import { getCurrentWeather, getCurrentWeatherByCoords } from '@Services/weatherApi';
+import { getCurrentWeather } from '@Services/weatherApi';
 
 interface UseWeatherState {
   data: WeatherResponse | null;
@@ -10,7 +10,6 @@ interface UseWeatherState {
 
 interface UseWeatherReturn extends UseWeatherState {
   fetchWeather: (cityName: string) => Promise<void>;
-  fetchWeatherByCoords: (lat: number, lon: number) => Promise<void>;
   clearError: () => void;
   clearData: () => void;
 }
@@ -68,33 +67,9 @@ export function useWeather(): UseWeatherReturn {
     }
   }, []);
 
-  const fetchWeatherByCoords = useCallback(async (lat: number, lon: number) => {
-    setState(prev => ({
-      ...prev,
-      loading: true,
-      error: null
-    }));
-
-    try {
-      const weatherData = await getCurrentWeatherByCoords(lat, lon);
-      setState({
-        data: weatherData,
-        loading: false,
-        error: null
-      });
-    } catch (error) {
-      setState({
-        data: null,
-        loading: false,
-        error: error as ApiError
-      });
-    }
-  }, []);
-
   return {
     ...state,
     fetchWeather,
-    fetchWeatherByCoords,
     clearError,
     clearData
   };

@@ -6,6 +6,7 @@ import {
   Typography
 } from '@mui/material';
 import { History } from '@mui/icons-material';
+
 import { searchHistoryStyles } from '../SearchHistory.styles';
 
 export function EmptyState() {
